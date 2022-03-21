@@ -14,8 +14,8 @@ def load_data():
     df_train = pd.read_csv(dataset_path + "train.csv", index_col='Id')
     df_test = pd.read_csv(dataset_path + "test.csv", index_col='Id')
     main_data = pd.concat([df_train, df_test])
-    numeric_columns = main_data.select_dtypes(include=np.number).columns.tolist()
-    num_cols = [nc for nc in numeric_columns if main_data[nc].nunique()>20]
+    num_cols = main_data.select_dtypes(include=np.number).columns.tolist()
+    # num_cols = [nc for nc in numeric_columns if main_data[nc].nunique()>20]
 
     df = main_data[num_cols]
     del df['SalePrice']
@@ -108,7 +108,7 @@ def prepare_data(df,main_data,num_cols, null_in_sale=50):
     X_train, y_train = train.drop("SalePrice", axis=1), train.SalePrice
     X_test, y_test = test.drop("SalePrice", axis=1), test.SalePrice
     
-    return X_train, X_test, y_train, y_test
+    return X_train, X_test, y_train, y_test, new_df
 
 
 def set_data(df, num_cols):
@@ -140,3 +140,31 @@ def split_data(df):
     X_test, y_test = test.drop(["SalePrice", "outlier"], axis=1), test.SalePrice
     
     return X_train, X_test, y_train, y_test
+
+
+def plot_num_cols(df, num_cols):
+    #we will create a histogram for each categorical attribute
+    n=len(num_cols)
+    if n == 0 :
+        return
+    cols = 3
+    rows= int(n/3)
+    if n%3 !=0:
+        rows + 1
+        
+    #max_bars = 8
+    #generate a figures grid:
+    fig, axes = plt.subplots(rows,cols,figsize=(cols*5,rows*5))
+    fig.subplots_adjust(hspace=0.5)
+    for i, column in enumerate(num_cols):
+        #calculate the current place on the grid
+        r=int(i/cols)
+        c=i%cols
+
+        # build the histograms
+        if rows > 1:
+            df[column].hist(ax=axes[r,c])
+            axes[r,c].set_title(column)
+        else:
+            df[column].hist(ax=axes[i])
+            axes[i].set_title(column)
