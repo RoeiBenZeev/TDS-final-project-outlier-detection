@@ -1,1 +1,1 @@
-warnings
+pytest-warnings==0.3.1
